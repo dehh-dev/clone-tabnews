@@ -4,5 +4,8 @@ services:
     image: "postgres:16.13-alpine3.23"
     env_file:
       - ../.env.development
+    environment:
+      TZ: "UTC"
+      PGTZ: "UTC"
     ports:
       - "5432:5432"
