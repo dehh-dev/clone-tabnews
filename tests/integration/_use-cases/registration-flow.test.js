@@ -8,6 +8,8 @@ beforeAll(async () => {
 });
 
 describe("Use cases: Registration Flow (all sucessful)", () => {
+  let createUserResponseBody;
+
   test("Create user account", async () => {
     const createUserResponse = await fetch(
       "http://localhost:3000/api/v1/users",
@@ -26,7 +28,7 @@ describe("Use cases: Registration Flow (all sucessful)", () => {
 
     expect(createUserResponse.status).toBe(201);
 
-    const createUserResponseBody = await createUserResponse.json();
+    createUserResponseBody = await createUserResponse.json();
 
     expect(createUserResponseBody).toEqual({
       id: createUserResponseBody.id,
@@ -39,7 +41,16 @@ describe("Use cases: Registration Flow (all sucessful)", () => {
     });
   });
 
-  test("Receive activation email", async () => {});
+  test("Receive activation email", async () => {
+    const lastEmail = await orchestrator.getLastEmail();
+
+    expect(lastEmail.sender).toBe("<contato@gmail.com.br>");
+    expect(lastEmail.recipients[0]).toBe("<registration.flow@gmail.com>");
+    expect(lastEmail.subject).toBe("Ative o seu cadastro na Plataforma!");
+    expect(lastEmail.text).toContain("RegistrationFlow");
+
+    console.log(lastEmail.text);
+  });
 
   test("Activate account", async () => {});
 
