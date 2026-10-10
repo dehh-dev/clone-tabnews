@@ -1,4 +1,6 @@
+import webserver from "infra/webserver";
 import orchestrator from "tests/orchestrator.js";
+import activation from "models/activation.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -49,7 +51,15 @@ describe("Use cases: Registration Flow (all sucessful)", () => {
     expect(lastEmail.subject).toBe("Ative o seu cadastro na Plataforma!");
     expect(lastEmail.text).toContain("RegistrationFlow");
 
-    console.log(lastEmail.text);
+    const activationTokenId = orchestrator.extractUUID(lastEmail.text);
+
+    expect(lastEmail.text).toContain(
+      `${webserver.origin}/cadastro/ativar/${activationTokenId}`,
+    );
+
+    const activationTokenObject =
+      await activation.findOneValidById(activationTokenId);
+    expect(activationTokenObject.used_at).toBe(null);
   });
 
   test("Activate account", async () => {});
